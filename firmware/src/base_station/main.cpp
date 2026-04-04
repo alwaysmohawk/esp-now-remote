@@ -6,24 +6,21 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <esp_now.h>
+#include <esp_wifi.h>
+#include "USB.h"
+#include "USBHIDKeyboard.h"
 #include "shared.h"
 
 // ---------------------------------------------------------------------------
-// USB HID (TinyUSB) — ESP32-S2 native USB
+// USB HID
 // ---------------------------------------------------------------------------
-// TODO: Add TinyUSB / USB HID includes and descriptor setup
-// The Arduino-ESP32 core for S2 includes TinyUSB support.
-// Uncomment and configure once the basic ESP-NOW RX is working.
-//
-// #include "USB.h"
-// #include "USBHIDKeyboard.h"
-// USBHIDKeyboard Keyboard;
+USBHIDKeyboard Keyboard;
 
 // ---------------------------------------------------------------------------
 // Globals
 // ---------------------------------------------------------------------------
-static volatile bool     msg_received = false;
-static volatile message_t last_msg    = {};
+static volatile bool      msg_received = false;
+static volatile message_t last_msg     = {};
 
 // ---------------------------------------------------------------------------
 // ESP-NOW receive callback
@@ -56,37 +53,21 @@ void handle_command(button_cmd_t cmd) {
     Serial.printf("Handling command: 0x%02X\n", cmd);
     #endif
 
+    uint8_t key = 0;
     switch (cmd) {
-        case CMD_BUTTON_1:
-            // TODO: send HID keypress for button 1
-            // Keyboard.press(KEY_F13);
-            // delay(50);
-            // Keyboard.release(KEY_F13);
-            #ifdef DEBUG
-            Serial.println("BTN1 → HID key TBD");
-            #endif
-            break;
-
-        case CMD_BUTTON_2:
-            // TODO: send HID keypress for button 2
-            #ifdef DEBUG
-            Serial.println("BTN2 → HID key TBD");
-            #endif
-            break;
-
-        case CMD_BUTTON_3:
-            // TODO: send HID keypress for button 3
-            #ifdef DEBUG
-            Serial.println("BTN3 → HID key TBD");
-            #endif
-            break;
-
+        case CMD_BUTTON_1: key = 'a'; break;
+        case CMD_BUTTON_2: key = 's'; break;
+        case CMD_BUTTON_3: key = 'd'; break;
         default:
             #ifdef DEBUG
             Serial.println("Unknown command");
             #endif
-            break;
+            return;
     }
+
+    Keyboard.press(key);
+    delay(50);
+    Keyboard.release(key);
 }
 
 // ---------------------------------------------------------------------------
@@ -99,16 +80,16 @@ void setup() {
     Serial.println("Base station booting...");
     #endif
 
-    // TODO: Initialize USB HID
-    // Keyboard.begin();
-    // USB.begin();
+    Keyboard.begin();
+    #ifdef DEBUG
+    USB.enableDFU(); // allows reflashing without boot+reset button dance
+    #endif
+    USB.begin();
 
     // Init Wi-Fi in STA mode
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();
-
-    // TODO: explicitly set Wi-Fi channel
-    // esp_wifi_set_channel(ESPNOW_CHANNEL, WIFI_SECOND_CHAN_NONE);
+    esp_wifi_set_channel(ESPNOW_CHANNEL, WIFI_SECOND_CHAN_NONE);
 
     // Init ESP-NOW
     if (esp_now_init() != ESP_OK) {

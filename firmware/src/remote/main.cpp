@@ -7,14 +7,15 @@
 #include <WiFi.h>
 #include <esp_now.h>
 #include <esp_sleep.h>
+#include <esp_wifi.h>
 #include "shared.h"
 
 // ---------------------------------------------------------------------------
 // Pin Definitions — update these to match your wiring
 // ---------------------------------------------------------------------------
-#define BTN_1_PIN  2   // TODO: confirm final pin assignment
-#define BTN_2_PIN  3   // TODO: confirm final pin assignment
-#define BTN_3_PIN  4   // TODO: confirm final pin assignment
+#define BTN_1_PIN  3   // D1 on XIAO ESP32-C3 silkscreen
+#define BTN_2_PIN  4   // D2 on XIAO ESP32-C3 silkscreen
+#define BTN_3_PIN  5   // D3 on XIAO ESP32-C3 silkscreen
 
 // ---------------------------------------------------------------------------
 // Globals
@@ -94,8 +95,7 @@ void setup() {
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();
 
-    // TODO: explicitly set Wi-Fi channel to match ESPNOW_CHANNEL
-    // esp_wifi_set_channel(ESPNOW_CHANNEL, WIFI_SECOND_CHAN_NONE);
+    esp_wifi_set_channel(ESPNOW_CHANNEL, WIFI_SECOND_CHAN_NONE);
 
     // Init ESP-NOW
     if (esp_now_init() != ESP_OK) {
