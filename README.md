@@ -48,4 +48,4 @@ docs/              Wiring diagrams, notes
 
 ## Status
 
-🚧 Work in progress — skeleton firmware, not yet tested on hardware.
+working well, pins labelled D1/D2/D3 (which are actually GPIO3/GPIO4/GPIO5) cause the receiver to type a/s/d.
