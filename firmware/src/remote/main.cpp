@@ -38,6 +38,7 @@ button_cmd_t read_button() {
     if (digitalRead(BTN_1_PIN) == LOW) return CMD_BUTTON_1;
     if (digitalRead(BTN_2_PIN) == LOW) return CMD_BUTTON_2;
     if (digitalRead(BTN_3_PIN) == LOW) return CMD_BUTTON_3;
+//    if (digitalRead(BTN_4_PIN) == LOW) return CMD_BUTTON_4;
     return CMD_NONE;
 }
 
@@ -47,7 +48,7 @@ button_cmd_t read_button() {
 void enter_deep_sleep() {
     // Configure wakeup on any button pin going LOW
     // Note: esp_deep_sleep_enable_gpio_wakeup() uses a bitmask of GPIO numbers
-    uint64_t wakeup_mask = (1ULL << BTN_1_PIN) | (1ULL << BTN_2_PIN) | (1ULL << BTN_3_PIN);
+    uint64_t wakeup_mask = (1ULL << BTN_1_PIN) | (1ULL << BTN_2_PIN) | (1ULL << BTN_3_PIN)/* | (1ULL << BTN_4_PIN)*/;
     esp_deep_sleep_enable_gpio_wakeup(wakeup_mask, ESP_GPIO_WAKEUP_GPIO_LOW);
 
     #ifdef DEBUG
@@ -72,6 +73,7 @@ void setup() {
     pinMode(BTN_1_PIN, INPUT_PULLUP);
     pinMode(BTN_2_PIN, INPUT_PULLUP);
     pinMode(BTN_3_PIN, INPUT_PULLUP);
+//    pinMode(BTN_4_PIN, INPUT_PULLUP);
 
     // Small debounce delay
     delay(50);

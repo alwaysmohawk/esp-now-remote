@@ -1,4 +1,4 @@
 .pio/build/remote/FrameworkArduino/USB.cpp.o: \
- /Users/alexander/.platformio/packages/framework-arduinoespressif32/cores/esp32/USB.cpp \
- /Users/alexander/.platformio/packages/framework-arduinoespressif32/cores/esp32/USB.h \
- /Users/alexander/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/qio_qspi/include/sdkconfig.h
+ C:/Users/AlexanderForster/.platformio/packages/framework-arduinoespressif32/cores/esp32/USB.cpp \
+ C:/Users/AlexanderForster/.platformio/packages/framework-arduinoespressif32/cores/esp32/USB.h \
+ C:/Users/AlexanderForster/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32c3/qio_qspi/include/sdkconfig.h

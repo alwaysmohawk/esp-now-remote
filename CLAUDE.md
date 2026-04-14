@@ -5,9 +5,10 @@
 A wireless 3-button remote control system using ESP-NOW protocol.
 
 - **Remote (TX):** Seeed XIAO ESP32-C3 — battery-powered, 3 buttons, deep sleep between presses
-- **Base Station (RX):** Lolin S2 Mini (ESP32-S2) — USB-connected, receives ESP-NOW commands and presents as USB HID device to the host computer
+- **Base Station HID (RX):** Lolin S2 Mini (ESP32-S2) — USB-connected, receives ESP-NOW commands and presents as USB HID device to the host computer
+- **Base Station Serial (RX):** NodeMCU ESP-32S — USB-connected via UART bridge, receives ESP-NOW commands and outputs button events to serial
 
-The remote sends button press events over ESP-NOW. The base station receives them and translates to HID keypresses (or media keys, etc.) over USB.
+The remote sends button press events over ESP-NOW. The base station receives them and either translates to HID keypresses over USB (S2 Mini) or prints button events to serial (NodeMCU ESP-32S).
 
 ## Tech Stack
 
@@ -26,12 +27,14 @@ esp-now-remote/
 ├── README.md
 ├── .gitignore
 ├── firmware/
-│   ├── platformio.ini     ← multi-environment config (remote + base_station)
+│   ├── platformio.ini     ← multi-environment config (remote + base_station + base_station_serial)
 │   ├── src/
 │   │   ├── remote/
-│   │   │   └── main.cpp   ← TX firmware entry point
-│   │   └── base_station/
-│   │       └── main.cpp   ← RX firmware entry point
+│   │   │   └── main.cpp          ← TX firmware entry point
+│   │   ├── base_station/
+│   │   │   └── main.cpp          ← RX firmware (USB HID, Lolin S2 Mini)
+│   │   └── base_station_serial/
+│   │       └── main.cpp          ← RX firmware (serial output, NodeMCU ESP-32S)
 │   ├── lib/
 │   │   └── shared/        ← shared library: protocol defs, message structs, config
 │   │       ├── shared.h
@@ -58,18 +61,23 @@ pio run
 # Upload to remote (connect XIAO ESP32-C3 via USB)
 pio run -e remote -t upload
 
-# Upload to base station (connect Lolin S2 Mini via USB)
+# Upload to base station HID (connect Lolin S2 Mini via USB)
 pio run -e base_station -t upload
+
+# Upload to base station serial (connect NodeMCU ESP-32S via USB)
+pio run -e base_station_serial -t upload
 
 # Serial monitor (specify port if needed)
 pio device monitor -e remote
 pio device monitor -e base_station
+pio device monitor -e base_station_serial
 ```
 
 ## PlatformIO Environment Names
 
 - `remote` — targets the Seeed XIAO ESP32-C3
-- `base_station` — targets the Lolin S2 Mini (ESP32-S2)
+- `base_station` — targets the Lolin S2 Mini (ESP32-S2), USB HID output
+- `base_station_serial` — targets the NodeMCU ESP-32S, serial output
 
 Each environment has its own `src_filter` in platformio.ini so only the relevant source files are compiled per target.
 
@@ -91,11 +99,17 @@ When modifying the protocol, always update `shared.h` — both targets include i
 - Deep sleep between button presses to conserve battery
 - Pin assignments: defined in `src/remote/main.cpp` (see TODO for final pin selection)
 
-### Base Station (Lolin S2 Mini)
+### Base Station HID (Lolin S2 Mini)
 - ESP32-S2 has native USB (USB-OTG), no UART-to-USB bridge
 - Acts as USB HID device to the host computer
 - Always powered via USB from the host
 - Uses the TinyUSB stack (included in Arduino-ESP32 for S2)
+
+### Base Station Serial (NodeMCU ESP-32S)
+- Standard ESP32 with a USB-UART bridge (CH340 or CP2102) — no native USB
+- Receives ESP-NOW commands and prints button events to serial (115200 baud)
+- Output format: `BUTTON_1`, `BUTTON_2`, `BUTTON_3` — one per line
+- Always powered via USB from the host
 
 ## Coding Conventions
 
@@ -111,6 +125,7 @@ When modifying the protocol, always update `shared.h` — both targets include i
 - **ESP-NOW channel:** Both devices MUST be on the same Wi-Fi channel. Default is channel 1. If one side inits Wi-Fi in STA mode, it may auto-switch channels. Explicitly set the channel after WiFi.mode().
 - **MAC addresses:** ESP-NOW requires the receiver's MAC address for unicast. For broadcast, use `FF:FF:FF:FF:FF:FF`. Broadcast is fine for a single-remote-single-base setup.
 - **S2 USB HID:** The Lolin S2 Mini uses native USB. When flashing, you may need to hold BOOT + tap RST to enter download mode. After flashing HID firmware, the board will enumerate as an HID device, not a serial port — use a `#define DEBUG` to conditionally enable CDC serial alongside HID for debugging.
+- **NodeMCU ESP-32S serial:** Uses a standard UART-to-USB bridge, so flashing and serial monitoring work without any special mode. Serial output is always enabled in `base_station_serial` (no `DEBUG` guard needed — serial IS the output).
 - **Deep sleep wakeup (C3):** Use `esp_deep_sleep_enable_gpio_wakeup()` on the button pins. After wakeup, the chip reboots — `setup()` runs again. Design accordingly.
 
 ## What Claude Should NOT Do
