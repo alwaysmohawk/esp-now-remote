@@ -42,7 +42,7 @@ void handle_command(button_cmd_t cmd) {
         case CMD_BUTTON_1: Serial.println("a"); break;
         case CMD_BUTTON_2: Serial.println("b"); break;
         case CMD_BUTTON_3: Serial.println("c"); break;
-        //case CMD_BUTTON_4: Serial.println("d"); break;
+        case CMD_BUTTON_4: Serial.println("d"); break;
         default:
             Serial.printf("Unknown command: 0x%02X\n", cmd);
             break;

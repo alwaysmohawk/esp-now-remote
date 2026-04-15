@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "Bash(pio run:*)",
-      "Bash(~/.platformio/penv/Scripts/pio run:*)"
+      "Bash(~/.platformio/penv/Scripts/pio run:*)",
+      "WebFetch(domain:wiki.seeedstudio.com)",
+      "Bash(~/.platformio/penv/Scripts/pio pkg:*)",
+      "Bash(~/.platformio/penv/Scripts/pio boards:*)",
+      "Bash(findstr /i \"qtpy\")",
+      "Bash(findstr /i \"qt\")",
+      "Bash(~/.platformio/penv/Scripts/pio device:*)"
     ]
   }
 }

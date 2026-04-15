@@ -22,6 +22,7 @@ typedef enum : uint8_t {
     CMD_BUTTON_1  = 0x01,
     CMD_BUTTON_2  = 0x02,
     CMD_BUTTON_3  = 0x03,
+    CMD_BUTTON_4  = 0x04,
 } button_cmd_t;
 
 // ---------------------------------------------------------------------------
